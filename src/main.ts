@@ -92,6 +92,7 @@ function* getPoints(trk: Element): Generator<TrackPoint> {
 }
 
 class PathAnimator {
+  private map: L.Map;
   private path: L.Polyline;
   private marker: L.Marker;
   private points: TrackPoint[];
@@ -101,6 +102,7 @@ class PathAnimator {
   private readonly epsilon: number = 5e-5; // Adjust this value to control simplification level
 
   constructor(map: L.Map, points: TrackPoint[]) {
+    this.map = map;
     // Simplify points using Ramer-Douglas-Peucker algorithm
     this.points = simplifyPoints(points, this.epsilon);
     console.log(
@@ -122,11 +124,15 @@ class PathAnimator {
       }),
     }).addTo(map);
 
+    this.recenter();
+  }
+
+  recenter() {
     // Fit map to bounds
     const bounds = L.latLngBounds(
       this.points.map((p) => L.latLng(p.lat, p.lon))
     );
-    map.fitBounds(bounds, { padding: [50, 50] });
+    this.map.fitBounds(bounds, { padding: [50, 50] });
   }
 
   start() {
@@ -187,6 +193,7 @@ function init() {
   let currentAnimator: PathAnimator | null = null;
 
   const restart = document.querySelector<HTMLButtonElement>("button#restart");
+  const recenter = document.querySelector<HTMLButtonElement>("button#recenter");
 
   async function getInput() {
     const item = input?.files?.item(0);
@@ -216,6 +223,7 @@ function init() {
     currentAnimator?.reset();
     currentAnimator?.start();
   });
+  recenter?.addEventListener("click", () => currentAnimator?.recenter());
 }
 
 init();
