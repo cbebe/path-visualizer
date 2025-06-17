@@ -23,19 +23,13 @@ body {
 }
 
 #popup {
-  height: 400px;
-  width:  400px;
   background-color: #eee;
   border-radius: 1rem;
   border: 2px solid black;
   position: absolute;
-  top: 5rem;
-  left: 0.5rem;
+  top: 0.5rem;
+  left: 3.5rem;
   z-index: 999;
 
   padding: 1rem;
-}
-
-#popup input[type=file] {
-  margin: 1rem;
 }
