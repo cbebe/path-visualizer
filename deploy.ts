@@ -1,5 +1,5 @@
 import { execSync } from "child_process";
-import { mkdtemp, rm } from "fs/promises";
+import { mkdtemp, rm, rmdir } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
 import { copy } from "fs-extra";
@@ -23,7 +23,7 @@ function getCmdOutput(cmd: string): string {
 
 async function mkTmpDir(): Promise<[string, () => Promise<void>]> {
   const dir = await mkdtemp(
-    join(tmpdir(), `${PROJECT_NAME.replaceAll('/', '-')}-${DEPLOYMENT_BRANCH}`)
+    join(tmpdir(), `${PROJECT_NAME.replaceAll("/", "-")}-${DEPLOYMENT_BRANCH}`)
   );
   return [
     dir,
@@ -37,19 +37,13 @@ async function mkTmpDir(): Promise<[string, () => Promise<void>]> {
   ];
 }
 
-function dieIf(err: Error | null): void {
-  if (err) {
-    console.error(err);
-    process.exit(1);
-  }
-}
-
 async function main(): Promise<void> {
   try {
     getCmdOutput("git config --get remote.origin.url");
     const latestHash = getCmdOutput("git rev-parse HEAD");
 
     if (BUILD_CMD) {
+      await rm(buildDir, { recursive: true, force: true });
       execCmd(BUILD_CMD);
     }
 
