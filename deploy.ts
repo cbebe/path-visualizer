@@ -1,8 +1,8 @@
 import { execSync } from "child_process";
-import { mkdtemp, rm, rmdir } from "fs/promises";
-import { join } from "path";
-import { tmpdir } from "os";
 import { copy } from "fs-extra";
+import { mkdtemp, rm } from "fs/promises";
+import { tmpdir } from "os";
+import { join } from "path";
 
 const buildDir = join("dist");
 
