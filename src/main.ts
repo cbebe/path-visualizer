@@ -1,6 +1,7 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./style.css";
+import { Measurer } from "./Measurer";
 
 interface TrackPoint {
   lat: number;
@@ -189,15 +190,40 @@ function init() {
       '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
   }).addTo(map);
 
+  const measure = document.querySelector<HTMLButtonElement>("button#measure");
+  const deletePrevious =
+    document.querySelector<HTMLButtonElement>("button#delete-prev");
+  if (!measure) throw new Error('There is no button with the id: "measure"');
+  if (!deletePrevious)
+    throw new Error('There is no button with the id: "delete-prev"');
+  Measurer.mount(map, measure, deletePrevious);
+
   const input = document.querySelector<HTMLInputElement>("input[type=file]");
+  const clear = document.querySelector<HTMLButtonElement>("button#clear");
   let currentAnimator: PathAnimator | null = null;
 
   const restart = document.querySelector<HTMLButtonElement>("button#restart");
   const recenter = document.querySelector<HTMLButtonElement>("button#recenter");
 
+  clear?.addEventListener("click", () => {
+    if (input) {
+      input.value = "";
+      input.files = null;
+      getInput();
+    }
+  });
+
   async function getInput() {
     const item = input?.files?.item(0);
-    if (!item) return;
+    if (!item) {
+      if (input) input.style.display = "";
+      if (clear) clear.style.display = "none";
+      currentAnimator?.reset();
+      return;
+    }
+
+    if (input) input.style.display = "none";
+    if (clear) clear.style.display = "";
 
     const parser = new DOMParser();
     const doc = parser.parseFromString(await item.text(), "text/xml");

@@ -1,22 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Path Visualizer</title>
+  </head>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Path Visualizer</title>
-</head>
-
-<body>
-  <div id="app"></div>
-  <div id="popup">
-    <button id="restart">Restart</button>
-    <button id="recenter">Recenter</button>
-    <input type="file">
-  </div>
-  <script type="module" src="/src/main.ts"></script>
-</body>
-
+  <body>
+    <div id="app"></div>
+    <div id="popup">
+      <button id="measure">Measure</button>
+      <button style="display: none" id="delete-prev">Delete Previous</button>
+      <button id="restart">Restart</button>
+      <button id="recenter">Recenter</button>
+      <input type="file" />
+      <button style="display: none" id="clear">Clear</button>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
 </html>
