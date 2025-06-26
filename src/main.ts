@@ -1,8 +1,8 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "./style.css";
 import { Measurer } from "./Measurer";
 import { PathAnimator, type TrackPoint } from "./PathAnimator";
+import "./style.css";
 
 function* getPoints(trk: Element): Generator<TrackPoint> {
   for (const seg of trk.querySelectorAll("trkseg")) {
@@ -42,7 +42,6 @@ function init() {
 
   const input = document.querySelector<HTMLInputElement>("input[type=file]");
   const clear = document.querySelector<HTMLButtonElement>("button#clear");
-  let currentAnimator: PathAnimator | null = null;
 
   const restart = document.querySelector<HTMLButtonElement>("button#restart");
   const recenter = document.querySelector<HTMLButtonElement>("button#recenter");
@@ -60,7 +59,7 @@ function init() {
     if (!item) {
       if (input) input.style.display = "";
       if (clear) clear.style.display = "none";
-      currentAnimator?.reset();
+      PathAnimator.reset();
       return;
     }
 
@@ -76,22 +75,14 @@ function init() {
 
     const points = Array.from(getPoints(trk));
 
-    // Restart any existing animation
-    currentAnimator?.reset();
-
-    // Create new animator and start animation
-    currentAnimator = new PathAnimator(map, points);
-    currentAnimator.start();
+    PathAnimator.start(map, points);
   }
 
   input?.addEventListener("input", getInput);
   getInput();
 
-  restart?.addEventListener("click", () => {
-    currentAnimator?.reset();
-    currentAnimator?.start();
-  });
-  recenter?.addEventListener("click", () => currentAnimator?.recenter());
+  restart?.addEventListener("click", () => PathAnimator.restart());
+  recenter?.addEventListener("click", () => PathAnimator.recenter());
 }
 
 init();

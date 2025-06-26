@@ -6,32 +6,55 @@ export interface TrackPoint {
 }
 
 export class PathAnimator {
-  private map: L.Map;
-  private path: L.Polyline;
-  private marker: L.Marker;
-  private points: TrackPoint[];
-  private currentIndex: number = 0;
-  private animationInterval: number | null = null;
-  private readonly interval: number = 75; // milliseconds
-  private readonly epsilon: number = 5e-5; // Adjust this value to control simplification level
+  #map: L.Map;
+  #path: L.Polyline;
+  #marker: L.Marker;
+  #points: TrackPoint[];
+  #currentIndex: number = 0;
+  #animationInterval: number | null = null;
+  readonly #interval: number = 75; // milliseconds
+  readonly #epsilon: number = 5e-5; // Adjust this value to control simplification level
+
+  static #animator: PathAnimator | null = null;
+
+  static reset() {
+    this.#animator?.reset();
+  }
+
+  static restart() {
+    this.#animator?.reset();
+    this.#animator?.start();
+  }
+
+  static recenter() {
+    this.#animator?.recenter();
+  }
+
+  static start(map: L.Map, points: TrackPoint[]) {
+    // Restart any existing animation
+    this.#animator?.reset();
+    // Create new animator and start animation
+    this.#animator = new PathAnimator(map, points);
+    this.#animator.start();
+  }
 
   constructor(map: L.Map, points: TrackPoint[]) {
-    this.map = map;
+    this.#map = map;
     // Simplify points using Ramer-Douglas-Peucker algorithm
-    this.points = PathAnimator.#simplifyPoints(points, this.epsilon);
+    this.#points = PathAnimator.#simplifyPoints(points, this.#epsilon);
     console.log(
-      `Simplified from ${points.length} to ${this.points.length} points`
+      `Simplified from ${points.length} to ${this.#points.length} points`
     );
 
     // Create a polyline for the path
-    this.path = L.polyline([], {
+    this.#path = L.polyline([], {
       color: "blue",
       weight: 2,
       opacity: 0.5,
     }).addTo(map);
 
     // Create a marker for the current position
-    this.marker = L.marker([0, 0], {
+    this.#marker = L.marker([0, 0], {
       icon: L.divIcon({
         className: "current-position-marker",
         html: '<div style="background-color: red; width: 10px; height: 10px; border-radius: 50%;"></div>',
@@ -44,45 +67,45 @@ export class PathAnimator {
   recenter() {
     // Fit map to bounds
     const bounds = L.latLngBounds(
-      this.points.map((p) => L.latLng(p.lat, p.lon))
+      this.#points.map((p) => L.latLng(p.lat, p.lon))
     );
-    this.map.fitBounds(bounds, { padding: [50, 50] });
+    this.#map.fitBounds(bounds, { padding: [50, 50] });
   }
 
   start() {
-    if (this.animationInterval) return;
+    if (this.#animationInterval) return;
 
-    this.animationInterval = window.setInterval(() => {
-      if (this.currentIndex >= this.points.length) {
+    this.#animationInterval = window.setInterval(() => {
+      if (this.#currentIndex >= this.#points.length) {
         this.stop();
         return;
       }
 
-      const currentPoint = this.points[this.currentIndex];
-      const pathPoints = this.points.slice(0, this.currentIndex + 1);
+      const currentPoint = this.#points[this.#currentIndex];
+      const pathPoints = this.#points.slice(0, this.#currentIndex + 1);
 
       // Update marker position
-      this.marker.setLatLng([currentPoint.lat, currentPoint.lon]);
+      this.#marker.setLatLng([currentPoint.lat, currentPoint.lon]);
 
       // Update path
-      this.path.setLatLngs(pathPoints.map((p) => [p.lat, p.lon]));
+      this.#path.setLatLngs(pathPoints.map((p) => [p.lat, p.lon]));
 
-      this.currentIndex++;
-    }, this.interval);
+      this.#currentIndex++;
+    }, this.#interval);
   }
 
   stop() {
-    if (this.animationInterval) {
-      clearInterval(this.animationInterval);
-      this.animationInterval = null;
+    if (this.#animationInterval) {
+      clearInterval(this.#animationInterval);
+      this.#animationInterval = null;
     }
   }
 
   reset() {
     this.stop();
-    this.currentIndex = 0;
-    this.marker.setLatLng([0, 0]);
-    this.path.setLatLngs([]);
+    this.#currentIndex = 0;
+    this.#marker.setLatLng([0, 0]);
+    this.#path.setLatLngs([]);
   }
 
   // Calculate perpendicular distance from point to line segment
