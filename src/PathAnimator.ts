@@ -1,11 +1,37 @@
 import L from "leaflet";
-
-export interface TrackPoint {
-  lat: number;
-  lon: number;
-}
+import type { TrackPoint } from "./GPXFileHandler";
 
 export class PathAnimator {
+  #map: L.Map;
+  #animation: PathAnimation | null = null;
+
+  constructor(
+    map: L.Map,
+    restart: HTMLButtonElement,
+    recenter: HTMLButtonElement
+  ) {
+    this.#map = map;
+    restart.addEventListener("click", () => {
+      this.#animation?.reset();
+      this.#animation?.start();
+    });
+    recenter.addEventListener("click", () => this.#animation?.recenter());
+  }
+
+  reset() {
+    this.#animation?.reset();
+  }
+
+  start(points: TrackPoint[]) {
+    // Restart any existing animation
+    this.#animation?.reset();
+    // Create new animator and start animation
+    this.#animation = new PathAnimation(this.#map, points);
+    this.#animation.start();
+  }
+}
+
+class PathAnimation {
   #map: L.Map;
   #path: L.Polyline;
   #marker: L.Marker;
@@ -15,33 +41,10 @@ export class PathAnimator {
   readonly #interval: number = 75; // milliseconds
   readonly #epsilon: number = 5e-5; // Adjust this value to control simplification level
 
-  static #animator: PathAnimator | null = null;
-
-  static reset() {
-    this.#animator?.reset();
-  }
-
-  static restart() {
-    this.#animator?.reset();
-    this.#animator?.start();
-  }
-
-  static recenter() {
-    this.#animator?.recenter();
-  }
-
-  static start(map: L.Map, points: TrackPoint[]) {
-    // Restart any existing animation
-    this.#animator?.reset();
-    // Create new animator and start animation
-    this.#animator = new PathAnimator(map, points);
-    this.#animator.start();
-  }
-
   constructor(map: L.Map, points: TrackPoint[]) {
     this.#map = map;
     // Simplify points using Ramer-Douglas-Peucker algorithm
-    this.#points = PathAnimator.#simplifyPoints(points, this.#epsilon);
+    this.#points = PathAnimation.#simplifyPoints(points, this.#epsilon);
     console.log(
       `Simplified from ${points.length} to ${this.#points.length} points`
     );

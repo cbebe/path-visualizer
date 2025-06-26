@@ -9,15 +9,6 @@ export class Measurer {
   #deleteButton: HTMLButtonElement;
   #dist = 0;
 
-  static #key = {};
-  static mount(
-    map: L.Map,
-    clearButton: HTMLButtonElement,
-    deleteButton: HTMLButtonElement
-  ) {
-    new Measurer(map, clearButton, deleteButton, Measurer.#key);
-  }
-
   #render() {
     this.#path.setLatLngs(this.#points);
     this.#marker.setLatLng(this.#points[this.#points.length - 1]);
@@ -36,11 +27,8 @@ export class Measurer {
   constructor(
     map: L.Map,
     clearButton: HTMLButtonElement,
-    deleteButton: HTMLButtonElement,
-    key: object
+    deleteButton: HTMLButtonElement
   ) {
-    if (key !== Measurer.#key)
-      throw new Error("Must instantiate using `mount`!");
     this.#map = map;
     this.#path = L.polyline([], {
       color: "red",
