@@ -1,23 +1,24 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/path-visualizer/vite.svg" />
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/path-visualizer/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Path Visualizer</title>
+    <script type="module" crossorigin src="/path-visualizer/assets/index-DGsPjeG7.js"></script>
+    <link rel="stylesheet" crossorigin href="/path-visualizer/assets/index-BiJPRpsf.css">
+  </head>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Path Visualizer</title>
-  <script type="module" crossorigin src="/path-visualizer/assets/index-k3iuEvLb.js"></script>
-  <link rel="stylesheet" crossorigin href="/path-visualizer/assets/index-BiJPRpsf.css">
-</head>
-
-<body>
-  <div id="app"></div>
-  <div id="popup">
-    <button id="restart">Restart</button>
-    <button id="recenter">Recenter</button>
-    <input type="file">
-  </div>
-</body>
-
+  <body>
+    <div id="app"></div>
+    <div id="popup">
+      <button id="measure">Measure</button>
+      <button style="display: none" id="delete-prev">Delete Previous</button>
+      <button id="restart">Restart</button>
+      <button id="recenter">Recenter</button>
+      <input type="file" />
+      <button style="display: none" id="clear">Clear</button>
+    </div>
+  </body>
 </html>
